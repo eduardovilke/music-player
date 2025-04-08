@@ -1,23 +1,23 @@
 # 🎵 Music Player Desktop App
 
-Um reprodutor de música feito com **Electron**, **Vue 3**, **TypeScript** e **WaveSurfer.js**, com suporte a **marcadores**, **loop**, **controle de velocidade**, **zoom**, e **visualização da forma de onda (waveform)**.
+A music player built with **Electron**, **Vue 3**, **TypeScript**, and **WaveSurfer.js**, featuring support for **markers**, **looping**, **playback speed control**, **zoom**, and **waveform visualization**.
 
 ![screenshot](./assets/screenshot.png)
 
-## 🚀 Funcionalidades
+## 🚀 Features
 
-- 🎧 Upload de arquivos de áudio
-- ▶️ Controles de reprodução: Play / Pause / Forward / Backward
-- 🕒 Controle de velocidade da reprodução
-- 🎚️ Zoom in/out na waveform
-- 🔁 Criação de regiões para loop
-- 🧼 Remoção do áudio carregado para reset
-- 🎨 Cores personalizadas para marcações
-- 📦 App desktop via Electron
+- 🎧 Upload audio files  
+- ▶️ Playback controls: Play / Pause / Forward / Backward  
+- 🕒 Playback speed control  
+- 🎚️ Waveform zoom in/out  
+- 🔁 Create loop regions  
+- 🧼 Remove loaded audio to reset the player  
+- 🎨 Custom colors for markers  
+- 📦 Desktop app powered by Electron  
 
 ---
 
-## 📦 Tecnologias Utilizadas
+## 📦 Technologies Used
 
 - [Vue 3](https://vuejs.org/)
 - [Electron](https://www.electronjs.org/)
@@ -28,12 +28,15 @@ Um reprodutor de música feito com **Electron**, **Vue 3**, **TypeScript** e **W
 
 ---
 
-## 🖥️ Instalação
+## 🖥️ Instalation
 
 ```bash
-# Clone o repositório
+# Clone the repo
 git clone https://github.com/seu-usuario/music-player.git
 cd music-player
 
-# Instale as dependências
+# Install all the dependencies
 npm install
+
+# Run the project
+npm start
