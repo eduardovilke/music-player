@@ -9,7 +9,7 @@ Um reprodutor de música feito com **Electron**, **Vue 3**, **TypeScript** e **W
 - 🎧 Upload de arquivos de áudio
 - ▶️ Controles de reprodução: Play / Pause / Forward / Backward
 - 🕒 Controle de velocidade da reprodução
-- 🎚️ Zoom in/out na waveform (incluindo via scroll do mouse)
+- 🎚️ Zoom in/out na waveform
 - 🔁 Criação de regiões para loop
 - 🧼 Remoção do áudio carregado para reset
 - 🎨 Cores personalizadas para marcações
