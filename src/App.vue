@@ -74,30 +74,44 @@
       />
     </div>
 
-    <div class="controls">
-      <Button 
-        :disabled="!fileInput" 
-        icon="pi pi-backward"
-        rounded
-        variant="text"
-        @click="backward" 
-      />
-      <Button
-        :disabled="!fileInput" 
-        :icon="isPlaying ? 'pi pi-pause' : 'pi pi-play'" 
-        rounded
-        outlined 
-        @click="playOrPause"
-        size="large"
-        class="play-pause"
-      />
-      <Button 
-        :disabled="!fileInput" 
-        icon="pi pi-forward"
-        variant="text"
-        rounded 
-        @click="forward" 
-      />
+    <div class="bottom">
+      <div class="music-title">
+        {{ musicName }}
+      </div>
+      <div class="controls">
+        <Button 
+          :disabled="!fileInput" 
+          icon="pi pi-backward"
+          rounded
+          variant="text"
+          @click="backward" 
+        />
+        <Button
+          :disabled="!fileInput" 
+          :icon="isPlaying ? 'pi pi-pause' : 'pi pi-play'" 
+          rounded
+          outlined 
+          @click="playOrPause"
+          class="play-pause"
+        />
+        <Button 
+          :disabled="!fileInput" 
+          icon="pi pi-forward"
+          variant="text"
+          rounded 
+          @click="forward" 
+        />
+      </div>
+      <div class="volume">
+        <Button 
+          @click="muteDesmute"
+          rounded 
+          outlined
+          variant="text"
+          :icon="volume === 0 ? 'pi pi-volume-off' : 'pi pi-volume-up'"
+        />
+        <Slider min="0" max="100" v-model="volume" orientation="horizontal" />
+      </div>
     </div>
   </div>
 </template>
@@ -109,7 +123,7 @@ import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom.esm.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
 
 import Button from 'primevue/button'
-import { Message } from 'primevue'
+import { Message, Slider } from 'primevue'
 
 const wavesurfer = ref(null)
 const playbackRate = ref(1.0)
@@ -119,6 +133,27 @@ const fileInput = ref(null)
 const isPlaying = ref(false)
 const regions = RegionsPlugin.create()
 const minPxPerSec = ref(1)
+const volume = ref(100)
+const lastVolume = ref(null)
+const musicName = ref(null)
+
+watch(playbackRate, (newValue) => {
+  wavesurfer.value?.setPlaybackRate(newValue)
+})
+
+watch(minPxPerSec, (newValue) => {
+  wavesurfer.value?.zoom(newValue)
+})
+
+watch(volume, (newValue, oldValue) => {
+  lastVolume.value = oldValue;
+  wavesurfer.value.setVolume(newValue / 100)
+})
+
+onMounted(async () => {
+  await nextTick();
+  createWaveSurfer();
+})
 
 const triggerFileInput = () => {
   fileInput.value.click()
@@ -129,11 +164,6 @@ const formatTime = (seconds) => {
   const sec = Math.floor(seconds % 60).toString().padStart(2, '0')
   return `${min}:${sec}`
 }
-
-onMounted(async () => {
-  await nextTick();
-  createWaveSurfer();
-})
 
 const playOrPause = () => {
   isPlaying.value = !isPlaying.value;
@@ -151,6 +181,7 @@ const resetPlayer = () => {
   currentTime.value = 0
   duration.value = 0
   isPlaying.value = false
+  musicName.value = null
 
   createWaveSurfer()
 }
@@ -158,6 +189,7 @@ const resetPlayer = () => {
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
+    musicName.value = file.name
     const objectUrl = URL.createObjectURL(file)
     wavesurfer.value.load(objectUrl)
   }
@@ -222,13 +254,7 @@ const createWaveSurfer = () => {
 
 const clearRegions = () => regions.clearRegions()
 
-watch(playbackRate, (newValue) => {
-  wavesurfer.value?.setPlaybackRate(newValue)
-})
 
-watch(minPxPerSec, (newValue) => {
-  wavesurfer.value?.zoom(newValue)
-})
 
 const forward = () => {
   const current = wavesurfer.value.getCurrentTime()
@@ -240,6 +266,14 @@ const backward = () => {
   const current = wavesurfer.value.getCurrentTime()
   wavesurfer.value.setTime(Math.max(current - 5, 0))
 }
+
+const muteDesmute = () => {
+  if(volume.value === 0 ) {
+    volume.value = lastVolume.value;
+  } else {
+    volume.value = 0;
+  }
+}
 </script>
 
 <style scoped>
@@ -250,7 +284,7 @@ const backward = () => {
   height: 100vh;
 }
 
-.controls, .speed-control {
+.speed-control, .controls {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -279,5 +313,30 @@ const backward = () => {
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
+}
+
+.bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+
+.volume {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.volume .p-slider {
+  margin-left: 6px;
+  width: 50%;
+}
+
+.music-title {
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
