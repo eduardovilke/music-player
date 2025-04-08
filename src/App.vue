@@ -91,7 +91,7 @@
           :icon="isPlaying ? 'pi pi-pause' : 'pi pi-play'" 
           rounded
           outlined 
-          @click="playOrPause"
+          @click="playPause"
           class="play-pause"
         />
         <Button 
@@ -110,7 +110,7 @@
           variant="text"
           :icon="volume === 0 ? 'pi pi-volume-off' : 'pi pi-volume-up'"
         />
-        <Slider min="0" max="100" v-model="volume" orientation="horizontal" />
+        <Slider v-model="volume" orientation="horizontal" />
       </div>
     </div>
   </div>
@@ -118,12 +118,9 @@
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
+import { Message, Slider, Button } from 'primevue'
 import WaveSurfer from 'wavesurfer.js'
-import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom.esm.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
-
-import Button from 'primevue/button'
-import { Message, Slider } from 'primevue'
 
 const wavesurfer = ref(null)
 const playbackRate = ref(1.0)
@@ -137,14 +134,8 @@ const volume = ref(100)
 const lastVolume = ref(null)
 const musicName = ref(null)
 
-watch(playbackRate, (newValue) => {
-  wavesurfer.value?.setPlaybackRate(newValue)
-})
-
-watch(minPxPerSec, (newValue) => {
-  wavesurfer.value?.zoom(newValue)
-})
-
+watch(playbackRate, (newValue) => wavesurfer.value?.setPlaybackRate(newValue))
+watch(minPxPerSec, (newValue) => wavesurfer.value?.zoom(newValue))
 watch(volume, (newValue, oldValue) => {
   lastVolume.value = oldValue;
   wavesurfer.value.setVolume(newValue / 100)
@@ -155,9 +146,7 @@ onMounted(async () => {
   createWaveSurfer();
 })
 
-const triggerFileInput = () => {
-  fileInput.value.click()
-}
+const triggerFileInput = () => fileInput.value.click()
 
 const formatTime = (seconds) => {
   const min = Math.floor(seconds / 60)
@@ -165,9 +154,8 @@ const formatTime = (seconds) => {
   return `${min}:${sec}`
 }
 
-const playOrPause = () => {
+const playPause = () => {
   isPlaying.value = !isPlaying.value;
-
   wavesurfer.value?.playPause()
 }
 
@@ -205,10 +193,6 @@ const createWaveSurfer = () => {
     minPxPerSec,
     barRadius: 10,
     plugins: [
-      ZoomPlugin.create({
-        scale: 0.5,
-        maxZoom: 100,
-      }),
       regions
     ]
   })
@@ -228,19 +212,16 @@ const createWaveSurfer = () => {
   let activeRegion = null
 
   regions.on('region-in', (region) => {
-    console.log('region-in', region)
     activeRegion = region
   })
 
   regions.on('region-out', (region) => {
-    console.log('region-out', region)
     if (activeRegion === region) {
       region.play()
     }
   })
 
   regions.on('region-clicked', (region, e) => {
-    console.log('regiao clicada')
     e.stopPropagation()
     activeRegion = region
     region.play(true)
@@ -254,19 +235,18 @@ const createWaveSurfer = () => {
 
 const clearRegions = () => regions.clearRegions()
 
-
-
 const forward = () => {
   const current = wavesurfer.value.getCurrentTime()
   const duration = wavesurfer.value.getDuration()
   wavesurfer.value.setTime(Math.min(current + 5, duration))
 }
 
-const backward = () => {
-  const current = wavesurfer.value.getCurrentTime()
-  wavesurfer.value.setTime(Math.max(current - 5, 0))
-}
-
+const backward = () => wavesurfer.value.setTime(
+  Math.max(
+    wavesurfer.value.getCurrentTime() - 5, 
+    0
+  )
+)
 const muteDesmute = () => {
   if(volume.value === 0 ) {
     volume.value = lastVolume.value;
